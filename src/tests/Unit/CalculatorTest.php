@@ -24,10 +24,10 @@ class CalculatorTest extends TestCase
         // Calculatorクラスのインスタンスを生成する
         $target = new Calculator();
         // 想定する計算結果を用意
-        $expected = 12;
+        $expected = 10;
         // sumメソッドを呼び出し、実測値を用意
         $actual = $target->sum(2, 8);
         // 期待値と実測値の値を比較して想定する結果と等しいか検証
-        $this->assertSame($expected, $$actual);
+        $this->assertSame($expected, $actual);
     }
 }
