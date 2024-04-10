@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: Install Composer dependencies
-          command: composer install --no-interaction --prefer-dist
+          command: cd src composer install --no-interaction --prefer-dist
       - run:
           name: php test
           command: vendor/bin/phpunit
