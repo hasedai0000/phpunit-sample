@@ -10,4 +10,4 @@ jobs:
           command: cd src && composer install --no-interaction --prefer-dist
       - run:
           name: php test
-          command: vendor/bin/phpunit
+          command: cd src && vendor/bin/phpunit
