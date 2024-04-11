@@ -3,17 +3,39 @@ jobs:
   build:
     docker:
       - image: cimg/php:8.1.27-node
+      - image: cimg/mysql:8.0
+        environment:
+          MYSQL_ROOT_PASSWORD: rootpw
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: passw0rd
     steps:
       - checkout
       - run:
-          name: Install Composer dependencies
-          command: cd src && composer install --no-interaction --prefer-dist
+        name: Install Composer dependencies
+        command: cd src && composer install --no-interaction --prefer-dist
       - restore_cache:
-          key: composer-v1-{{ checksum "src/composer.lock" }}
+        key: composer-v1-{{ checksum "src/composer.lock" }}
       - save_cache:
-          key: composer-v1-{{ checksum "src/composer.lock" }}
-          paths:
-            - src/vendor
+        key: composer-v1-{{ checksum "src/composer.lock" }}
+        paths:
+          - src/vendor
+      - run:
+          name: MySQL が準備できるまで待機
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z 127.0.0.1 3306 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for MySQL && exit 1
+      - run:
+        name: MySQL CLI のインストール; ダミー データのインポート; サンプル クエリの実行
+        command: |
+          sudo apt-get install default-mysql-client
+          mysql -h 127.0.0.1 -u user -ppassw0rd test_db < sql-data/dummy.sql
+          mysql -h 127.0.0.1 -u user -ppassw0rd --execute="SELECT * FROM test_db.Persons"
       - run:
           name: php test
           command: cd src && vendor/bin/phpunit
